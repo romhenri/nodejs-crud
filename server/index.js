@@ -28,7 +28,7 @@ app.post('/api/product', async (req, res) => {
 
   } catch (error) {
     res.status(500).send({message: error.message});
-  }
+  };
 });
 
 // Get Products Request
@@ -41,7 +41,7 @@ app.get('/api/products', async (req, res) => {
 
   } catch (error) {
     res.status(500).send({message: error.message});
-  }
+  };
 });
 
 // Get Product(id) Request
@@ -59,7 +59,7 @@ app.get('/api/product/:id', async (req, res) => {
 
   } catch (error) {
     res.status(500).send({message: error.message});
-  }
+  };
 });
 
 // Put Product(id) Request
@@ -79,8 +79,26 @@ app.put('/api/product/:id', async (req, res) => {
     res.status(200).json(updatedProduct);
   } catch (error) {
     res.status(500).send({message: error.message});
-  }
+  };
 })
+
+// Delete Product(id) Request
+app.delete('/api/product/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`SERVER: Delete Request for id: ${id}`);
+
+    const product = await Product.findByIdAndDelete(id);
+
+    if (!product) {
+      res.status(404).json({message: 'Product not found!'});
+      return;
+    };
+    res.status(200).json({message: 'Product deleted!', deleted: {product}});
+  } catch (error) {
+    res.status(500).send({message: error.message});
+  };
+});
 
 // Start Server
 app.listen(3000, () => {
