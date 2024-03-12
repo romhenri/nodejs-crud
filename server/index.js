@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 const Product = require('./src/models/product.model.js');
 
@@ -61,6 +62,26 @@ app.get('/api/product/:id', async (req, res) => {
   }
 });
 
+// Put Product(id) Request
+app.put('/api/product/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`SERVER: Put Request for id: ${id}`);
+
+    const product = await Product.findByIdAndUpdate(id,req.body,);
+
+    if (!product) {
+      res.status(404).json({message: 'Product not found!'});
+      return;
+    };
+
+    const updatedProduct = await Product.findById(id);
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    res.status(500).send({message: error.message});
+  }
+})
+
 // Start Server
 app.listen(3000, () => {
   if (password == '') {
@@ -70,7 +91,7 @@ app.listen(3000, () => {
   console.log('SERVER: Server is running on port 3000!')
 });
 
-let password = '';
+let password = process.env.MONGODB_PASSWORD;
 let uri = `mongodb+srv://romulohenri000:${password}@backenddb.fwhrjwq.mongodb.net/Node-API?retryWrites=true&w=majority&appName=BackendDB`;
 
 if (password) {
@@ -81,4 +102,4 @@ if (password) {
   .catch((err) => {
     console.error('SERVER: Could not connect to MongoDB!', err.message);
   });
-}
+};
