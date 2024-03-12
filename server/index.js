@@ -2,10 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const Product = require('./src/models/product.model.js');
+const productRoutes = require('./src/routes/product.route.js');
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
+// Routes
+app.use('/api/products', productRoutes);
 
 // Root Get Request
 app.get('/', (req, res) => {
@@ -16,88 +20,6 @@ app.get('/', (req, res) => {
     return;
   }
   res.json({active: true});
-});
-
-// Post Product Request
-app.post('/api/product', async (req, res) => {
-  try {
-    console.log('SERVER: Post Request!');
-
-    const product = await Product.create(req.body);
-    res.status(200).send(product);
-
-  } catch (error) {
-    res.status(500).send({message: error.message});
-  };
-});
-
-// Get Products Request
-app.get('/api/products', async (req, res) => {
-  try {
-    console.log('SERVER: Get Request!');
-
-    const products = await Product.find({});
-    res.status(200).send(products);
-
-  } catch (error) {
-    res.status(500).send({message: error.message});
-  };
-});
-
-// Get Product(id) Request
-app.get('/api/product/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    console.log(`SERVER: Get Request for id: ${id}`);
-
-    const product = await Product.findById(id);
-    if (!product) {
-      res.status(404).send({message: 'Product not found!'});
-      return;
-    }
-    res.status(200).send(product);
-
-  } catch (error) {
-    res.status(500).send({message: error.message});
-  };
-});
-
-// Put Product(id) Request
-app.put('/api/product/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    console.log(`SERVER: Put Request for id: ${id}`);
-
-    const product = await Product.findByIdAndUpdate(id,req.body,);
-
-    if (!product) {
-      res.status(404).json({message: 'Product not found!'});
-      return;
-    };
-
-    const updatedProduct = await Product.findById(id);
-    res.status(200).json(updatedProduct);
-  } catch (error) {
-    res.status(500).send({message: error.message});
-  };
-})
-
-// Delete Product(id) Request
-app.delete('/api/product/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    console.log(`SERVER: Delete Request for id: ${id}`);
-
-    const product = await Product.findByIdAndDelete(id);
-
-    if (!product) {
-      res.status(404).json({message: 'Product not found!'});
-      return;
-    };
-    res.status(200).json({message: 'Product deleted!', deleted: {product}});
-  } catch (error) {
-    res.status(500).send({message: error.message});
-  };
 });
 
 // Start Server
